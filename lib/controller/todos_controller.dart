@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:get/get.dart';
 import 'package:todos_app/auth/todos_service.dart';
 import 'package:todos_app/models/task_model.dart';
@@ -8,14 +10,11 @@ class TodosController extends GetxController {
   Rx<bool> isLoading = Rx(false);
   Rx<String?> error = Rx(null);
 
-  @override
-  void onInit() {
-    super.onInit();
-    _getTodos();
-  }
-  void _getTodos() {
+  void getTodos() {
       isLoading.value = true;
+      print("Controller BLOC 1");
       try {
+        print("Controller BLOC 2");
         _todosService.getTodos().then((value){
           if(value != null){
             rxList?.value = value;
@@ -24,6 +23,7 @@ class TodosController extends GetxController {
           isLoading.value = false;
         });
       } catch(e){
+        print("Controller BLOC 3");
         isLoading.value = false;
         error.value = e.toString();
       }

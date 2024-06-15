@@ -9,10 +9,12 @@ class TodosHelper {
   static const int _databaseVersion = 1;
 
   static const String table = "_todos";
-  static const String columnID = "_id";
+  static const String columnTaskId = "_id";
   static const String columnTaskTitle =  "_title";
   static const String columnTaskDate = "_date";
-  static const String columnStatus = "_status";
+  static const String columnTaskTime = "_time";
+  static const String columnColor = "_color";
+  static const String columnTimeStamp = "_timeStamp";
 
   // make this a singleton class
   TodosHelper._privateConstructor();
@@ -25,18 +27,20 @@ class TodosHelper {
     return _database;
   }
   Future _init() async {
-     String databasePath = await getDatabasesPath();
-     String path = join(databasePath + _databaseName,);
-     return await openDatabase(path,version: _databaseVersion,onCreate: (db,version) async {
-       await db.execute('''
-          CREATE TABLE $table (
-            $columnID INTEGER PRIMARY KEY,
-            $columnTaskTitle TEXT NOT NULL,
-            $columnTaskDate TEXT NOT NULL,
-            $columnStatus INTEGER NOT NULL,
-          )
-          ''');
-     });
+    String databasePath = await getDatabasesPath();
+    String path = join(databasePath, _databaseName); // Corrected the join function call
+    return await openDatabase(path, version: _databaseVersion, onCreate: (db, version) async {
+      await db.execute('''
+      CREATE TABLE $table (
+        $columnTaskId INTEGER PRIMARY KEY,
+        $columnTaskTitle TEXT NOT NULL,
+        $columnTaskDate TEXT NOT NULL,
+        $columnTaskTime TEXT NOT NULL,
+        $columnColor TEXT NOT NULL,
+        $columnTimeStamp INTEGER NOT NULL
+      )
+      ''');
+    });
   }
   Future<int?> insertTodo(TaskModel taskModel) async {
      var db = await createDB();
