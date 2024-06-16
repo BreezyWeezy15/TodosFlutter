@@ -22,7 +22,7 @@ class TodosController extends GetxController {
     try {
       var data = await _todosService.getTodos();
       if(data!.isNotEmpty){
-        rxList.value = data;
+        rxList.addAll(data);
         isLoading.value = false;
       } else {
         error.value = "No Tasks Found";
@@ -33,20 +33,17 @@ class TodosController extends GetxController {
       error.value = e.toString();
     }
   }
-
   Future<int?> insertTask(TaskModel taskModel) async {
     return await _todosService.insertTask(taskModel);
   }
-
   Future<int?> deleteTask(TaskModel taskModel) async {
     return await _todosService.deleteTask(taskModel);
   }
-
   Future<int?> updateTask(TaskModel taskModel) async {
     return await _todosService.updateTask(taskModel);
   }
-
   Future<int?> deleteAllTasks() async {
     return await _todosService.deleteAllTasks();
   }
+
 }
