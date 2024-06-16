@@ -12,15 +12,14 @@ class TodosController extends GetxController {
 
   void getTodos() {
       isLoading.value = true;
-      print("Controller BLOC 1");
       try {
-        print("Controller BLOC 2");
         _todosService.getTodos().then((value){
           if(value != null){
             rxList?.value = value;
             isLoading.value = false;
+            rxList?.refresh();
+            return;
           }
-          isLoading.value = false;
         });
       } catch(e){
         print("Controller BLOC 3");

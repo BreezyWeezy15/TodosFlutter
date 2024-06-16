@@ -54,7 +54,7 @@ class TodosHelper {
     var db = await createDB();
     return await db?.delete(
       table,
-      where: "columnID = ?",
+      where: "_id = ?",
       whereArgs: [taskModel.id]
     );
   }

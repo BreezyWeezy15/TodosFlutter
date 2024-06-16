@@ -1,4 +1,7 @@
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -16,6 +19,7 @@ class TasksDetails extends StatefulWidget {
 }
 
 class _TasksDetailsState extends State<TasksDetails> {
+  static late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   late TodosController _todosController;
   var pickedDate = "";
   var pickedTime = "";
@@ -34,6 +38,8 @@ class _TasksDetailsState extends State<TasksDetails> {
   void initState() {
     super.initState();
     _todosController  = Get.find();
+    initializePlatformSpecifics();
+    showNotification("param1", "param2");
   }
 
   @override
@@ -45,7 +51,7 @@ class _TasksDetailsState extends State<TasksDetails> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 30,top: 15),
                 child: Row(
                   children: [
                     GestureDetector(
@@ -60,32 +66,38 @@ class _TasksDetailsState extends State<TasksDetails> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 10,right: 50,top: 50),
+                padding: const EdgeInsets.only(left: 30,right: 30,top: 50),
                 child: Text("Task Title",style: getMedFont().copyWith(fontSize: 20),),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 10,right: 50,top: 5),
+                padding: const EdgeInsets.only(left: 30,right: 30,top: 5),
                 child: TextField(
                   controller: _taskController,
+                  style: getMedFont().copyWith(fontSize: 18),
                   decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20)
+                      ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
                       hintText: "Task Title",
-                      hintStyle: getMedFont().copyWith()
+                      hintStyle: getMedFont()
                   ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 10,right: 50,top: 20),
+                padding: const EdgeInsets.only(left: 30,right: 30,top: 20),
                 child: Text("Task Date",style: getMedFont().copyWith(fontSize: 20),),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 10,right: 50,top: 5),
+                padding: const EdgeInsets.only(left: 30,right: 30,top: 5),
                 child: TextField(
                   controller: _dateController,
                   readOnly: true,
+                  style: getMedFont().copyWith(fontSize: 18),
                   decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20)
+                      ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
                       hintText: "Task Date",
                       suffixIcon: GestureDetector(
@@ -110,15 +122,18 @@ class _TasksDetailsState extends State<TasksDetails> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 10,right: 50,top: 20),
+                padding: const EdgeInsets.only(left: 30,right: 30,top: 20),
                 child: Text("Task Time",style: getMedFont().copyWith(fontSize: 18),),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 10,right: 50,top: 5),
+                padding: const EdgeInsets.only(left: 30,right: 30,top: 5),
                 child: TextField(
                   controller: _timeController,
+                  style: getMedFont().copyWith(fontSize: 18),
                   decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20)
+                      ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
                       hintText: "Task Time",
                       hintStyle: getMedFont().copyWith(),
@@ -142,12 +157,12 @@ class _TasksDetailsState extends State<TasksDetails> {
               ),
               const Gap(30),
               Padding(
-                padding: const EdgeInsets.only(left: 10,right: 50,top: 20),
+                padding: const EdgeInsets.only(left: 30,right: 30,top: 20),
                 child: Text("Pick Your Task Color",style: getMedFont().copyWith(fontSize: 18),),
               ),
               const Gap(10),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 30,right: 20,top: 10),
                 child: Row(
                   children: List<Widget>.generate(_colors.length, (index){
                     return GestureDetector(
@@ -158,12 +173,16 @@ class _TasksDetailsState extends State<TasksDetails> {
                         });
                       },
                       child: Container(
-                        margin: const EdgeInsets.only(right: 5),
+                        margin: const EdgeInsets.only(right: 15),
                         width: 50,
                         height: 50,
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Color(hexStringToHexInt(_colors[index]))
+                        ),
+                        child: Center(
+                          child: selectedColorIndex == index ? const Icon(Icons.done,size: 30,
+                          color: Colors.white,) : Container(),
                         ),
                       ),
                     );
@@ -175,6 +194,7 @@ class _TasksDetailsState extends State<TasksDetails> {
                 padding: const EdgeInsets.all(8.0),
                 child: GestureDetector(
                   onTap: () async {
+                   // await initializePlatformSpecifics();
                     var task = _taskController.text.toString();
                     var date = _dateController.text.toString();
                     var time = _timeController.text.toString();
@@ -209,9 +229,12 @@ class _TasksDetailsState extends State<TasksDetails> {
                       setState(() {
                         pickedColor = "";
                       });
-                    } else {
+                       createAlarm();
+                    }
+                    else {
                       Fluttertoast.showToast(msg: "Failed to add task");
                     }
+
                   },
                   child: Center(
                     child: Container(
@@ -234,8 +257,6 @@ class _TasksDetailsState extends State<TasksDetails> {
       ),
     );
   }
-
-
   formatDate(DateTime dateTime){
     DateFormat dateFormat  = DateFormat("yyyy-MM-dd");
     var formattedDate = dateFormat.format(dateTime);
@@ -250,5 +271,56 @@ class _TasksDetailsState extends State<TasksDetails> {
        timeOfDay.minute
      );
   }
+  @pragma("vm:entry-point")
+  static void fireAlarmManager(){
 
+  }
+  void createAlarm() async {
+      await AndroidAlarmManager.oneShotAt(
+          combineDateTime(dateStamp, timeStamp),
+          DateTime.now().minute,
+          fireAlarmManager,
+          params: {
+            'param1' : "Ready!",
+            'param2' : "Time to do your work"
+          });
+  }
+  initializePlatformSpecifics() async {
+    var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: false,
+      onDidReceiveLocalNotification: (id, title, body, payload) async {
+        // your call back to the UI
+      },
+    );
+    InitializationSettings initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsIOS);
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+  static Future<void> showNotification(String param1, String param2) async {
+    var androidChannelSpecifics = const AndroidNotificationDetails(
+      'CHANNEL_ID',
+      'CHANNEL_NAME',
+      importance: Importance.max,
+      priority: Priority.high,
+      playSound: true,
+      timeoutAfter: 5000,
+      styleInformation: DefaultStyleInformation(true, true),
+    );
+    var iosChannelSpecifics = const DarwinNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        android: androidChannelSpecifics,
+        iOS: iosChannelSpecifics
+    );
+    await flutterLocalNotificationsPlugin.show(
+        100, // Notification ID
+        param1, // Notification Title
+        param2, // Notification Body, set as null to remove the body
+        platformChannelSpecifics,
+        payload: 'New Payload');
+  }
 }
