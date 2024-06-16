@@ -5,12 +5,9 @@ import 'package:todos_app/main.dart';
 import 'package:todos_app/models/task_model.dart';
 
 class TodosService {
-   List<Map<String, Object?>>? _list = [];
 
    Future<List<TaskModel>?> getTodos() async {
-     _list?.clear();
-     _list = await todosHelper.getTodos();
-     return _list?.map((e) => TaskModel.fromJson(e)).toList();
+     return await todosHelper.getTodos();
    }
    Future<int?> insertTask(TaskModel taskModel) async {
      return await todosHelper.insertTodo(taskModel);

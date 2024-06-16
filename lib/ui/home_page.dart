@@ -24,8 +24,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _todosController = Get.put(TodosController());
-    _todosController.getTodos();
-   // initializePlatformSpecifics();
   }
 
   @override
@@ -43,7 +41,9 @@ class _HomePageState extends State<HomePage> {
                       "Tasks", style: getBoldFont().copyWith(fontSize: 25),)),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const TasksDetails()));
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const TasksDetails())).then((value){
+                             _todosController.getTodos();
+                        });
                       },
                       child: const Icon(Icons.add, size: 30,),
                     ),

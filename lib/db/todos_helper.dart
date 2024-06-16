@@ -1,10 +1,12 @@
 
+import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:todos_app/controller/todos_controller.dart';
 import 'package:todos_app/models/task_model.dart';
 
 class TodosHelper {
+
   static const String _databaseName = "todos.db";
   static const int _databaseVersion = 1;
 
@@ -46,10 +48,13 @@ class TodosHelper {
      var db = await createDB();
      return await db?.insert(table, taskModel.toJson());
   }
-  Future<List<Map<String, Object?>>?> getTodos() async {
+  Future<List<TaskModel>?>getTodos() async {
     var db = await createDB();
-    return await db?.query(table);
+    var data =  await db?.query(table);
+    var values = data?.map((e) => TaskModel.fromJson(e)).toList();
+    return values;
   }
+
   Future<int?> deleteTodo(TaskModel taskModel) async {
     var db = await createDB();
     return await db?.delete(
