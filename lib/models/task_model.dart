@@ -1,68 +1,99 @@
 class TaskModel {
   static const String columnTaskId = "_id";
-  static const String columnAlarmId = "_alarmId";
+  static const String columnAlarmID = "_alarmID";
   static const String columnTaskTitle = "_title";
   static const String columnTaskDate = "_date";
   static const String columnTaskTime = "_time";
-  static const String columnTimeStamp = "_timeStamp";
   static const String columnColor = "_color";
+  static const String columnTimeStamp = "_timeStamp";
   static const String columnCategory = "_category";
   static const String columnColorIndex = "_colorIndex";
   static const String columnCategoryIndex = "_categoryIndex";
 
-  int id;
-  int alarmId;
+  int? id;
+  int alarmID;
   String title;
   String date;
   String time;
-  int timeStamp;
   String color;
+  int timeStamp;
   String category;
   int colorIndex;
   int categoryIndex;
 
   TaskModel({
-    required this.id,
-    required this.alarmId,
+    this.id,
+    required this.alarmID,
     required this.title,
     required this.date,
     required this.time,
-    required this.timeStamp,
     required this.color,
+    required this.timeStamp,
     required this.category,
     required this.colorIndex,
     required this.categoryIndex,
   });
 
-  // Factory constructor to create a TaskModel from a JSON map
-  factory TaskModel.fromJson(Map<String, dynamic> json) {
-    return TaskModel(
-      id: json[columnTaskId] as int,
-      alarmId: json[columnAlarmId] as int,
-      title: json[columnTaskTitle] as String,
-      date: json[columnTaskDate] as String,
-      time: json[columnTaskTime] as String,
-      timeStamp: json[columnTimeStamp] as int,
-      color: json[columnColor] as String,
-      category: json[columnCategory] as String,
-      colorIndex: json[columnColorIndex] as int,
-      categoryIndex: json[columnCategoryIndex] as int,
-    );
-  }
-
-  // Method to convert a TaskModel to a JSON map
-  Map<String, dynamic> toJson() {
-    return {
-      columnTaskId: id,
-      columnAlarmId: alarmId,
+  Map<String, dynamic> toMap() {
+    var map = <String, dynamic>{
+      columnAlarmID: alarmID,
       columnTaskTitle: title,
       columnTaskDate: date,
       columnTaskTime: time,
-      columnTimeStamp: timeStamp,
       columnColor: color,
+      columnTimeStamp: timeStamp,
       columnCategory: category,
       columnColorIndex: colorIndex,
       columnCategoryIndex: categoryIndex,
     };
+    if (id != null) {
+      map[columnTaskId] = id;
+    }
+    return map;
+  }
+
+  factory TaskModel.fromMap(Map<String, dynamic> map) {
+    return TaskModel(
+      id: map[columnTaskId],
+      alarmID: map[columnAlarmID],
+      title: map[columnTaskTitle],
+      date: map[columnTaskDate],
+      time: map[columnTaskTime],
+      color: map[columnColor],
+      timeStamp: map[columnTimeStamp],
+      category: map[columnCategory],
+      colorIndex: map[columnColorIndex],
+      categoryIndex: map[columnCategoryIndex],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      columnTaskId: id,
+      columnAlarmID: alarmID,
+      columnTaskTitle: title,
+      columnTaskDate: date,
+      columnTaskTime: time,
+      columnColor: color,
+      columnTimeStamp: timeStamp,
+      columnCategory: category,
+      columnColorIndex: colorIndex,
+      columnCategoryIndex: categoryIndex,
+    };
+  }
+
+  factory TaskModel.fromJson(Map<String, dynamic> json) {
+    return TaskModel(
+      id: json[columnTaskId],
+      alarmID: json[columnAlarmID],
+      title: json[columnTaskTitle],
+      date: json[columnTaskDate],
+      time: json[columnTaskTime],
+      color: json[columnColor],
+      timeStamp: json[columnTimeStamp],
+      category: json[columnCategory],
+      colorIndex: json[columnColorIndex],
+      categoryIndex: json[columnCategoryIndex],
+    );
   }
 }

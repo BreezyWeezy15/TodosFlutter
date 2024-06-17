@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                                 // onDismiss
                                 int? result = await _todosController.deleteTask(data[index]);
                                 if(result == 1){
-                                  await Alarm.stop(data[index].alarmId);
+                                  await Alarm.stop(data[index].alarmID);
                                   Fluttertoast.showToast(msg: "Task successfully removed");
                                 } else {
                                   Fluttertoast.showToast(msg: "Failed to remove task");
@@ -130,8 +130,8 @@ class _HomePageState extends State<HomePage> {
                               child: GestureDetector(
                                 onTap: (){
                                   // edit values
-                                  int taskID = data[index].id;
-                                  int alarmId = data[index].alarmId;
+                                  int? taskID = data[index].id;
+                                  int alarmId = data[index].alarmID;
                                   String task = data[index].title;
                                   String date = data[index].date;
                                   String time = data[index].time;
@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> {
                                   int colorIndex = data[index].colorIndex;
                                   int categoryIndex = data[index].categoryIndex;
 
-                                  Navigator.push(context, MaterialPageRoute(builder: (_) =>  EditTaskPage(taskID : taskID , alarmID: alarmId,
+                                  Navigator.push(context, MaterialPageRoute(builder: (_) =>  EditTaskPage(taskID : taskID! , alarmID: alarmId,
                                       task: task, date: date, time: time, color: color,category: category,
                                      selectedColorIndex: colorIndex,selectedCategoryIndex: categoryIndex,))).then((value){
                                          _todosController.getTodos();
@@ -174,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                                                       ElevatedButton(onPressed: () async {
                                                         int? result = await _todosController.deleteTask(data[index]!);
                                                         if(result == 1){
-                                                          await Alarm.stop(data[index].alarmId);
+                                                          await Alarm.stop(data[index].alarmID);
                                                           Fluttertoast.showToast(msg: "Task successfully removed");
                                                           if(context.mounted) Navigator.pop(context);
                                                         } else {

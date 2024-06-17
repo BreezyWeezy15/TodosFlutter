@@ -22,9 +22,9 @@ class TodosController extends GetxController {
     try {
       var data = await _todosService.getTodos();
       if(data!.isNotEmpty){
+        print("Value Posted ${data[0].alarmID}");
         rxList.addAll(data);
         isLoading.value = false;
-        print("Value ${data[0].alarmId}");
       } else {
         error.value = "No Tasks Found";
         isLoading.value = false;

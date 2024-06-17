@@ -135,6 +135,7 @@ class _TasksDetailsState extends State<TasksDetails> {
                 padding: const EdgeInsets.only(left: 30, right: 30, top: 5),
                 child: TextField(
                   controller: _timeController,
+                  readOnly: true,
                   style: getMedFont().copyWith(fontSize: 18),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
@@ -260,11 +261,15 @@ class _TasksDetailsState extends State<TasksDetails> {
                       Fluttertoast.showToast(msg: "No color picked");
                       return;
                     }
+                    if (pickedCategory.isEmpty) {
+                      Fluttertoast.showToast(msg: "No Category picked");
+                      return;
+                    }
 
                     var alarmId = int.parse(DateTime.now().microsecondsSinceEpoch.toString().substring(0,5));
                     TaskModel taskModel = TaskModel(
-                      id: alarmId,
-                      alarmId: alarmId,
+                      id: DateTime.now().microsecondsSinceEpoch,
+                      alarmID: alarmId,
                       title: task,
                       date: pickedDate,
                       time: pickedTime,
