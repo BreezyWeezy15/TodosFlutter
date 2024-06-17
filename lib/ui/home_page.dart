@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.only(left: 20,right: 20,top: 10),
                 child: Row(
                   children: [
                     Expanded(child: Text(
@@ -54,7 +54,15 @@ class _HomePageState extends State<HomePage> {
                              _todosController.getTodos(_tabs[selectedTab]);
                         });
                       },
-                      child: const Icon(Icons.add, size: 30,),
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.black54
+                        ),
+                        child :  const Icon(Icons.add, size: 20,color: Colors.white,),
+                      ),
                     ),
                     const Gap(10),
                     GestureDetector(
@@ -86,16 +94,23 @@ class _HomePageState extends State<HomePage> {
                               );
                             });
                       },
-                      child: const Icon(
-                        Icons.delete_forever_rounded, size: 30,),
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.black54
+                        ),
+                        child :  const Icon(Icons.delete_forever_rounded, size: 20,color: Colors.white,),
+                      ),
                     )
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 20,right: 20,top: 20),
+                padding: const EdgeInsets.only(left: 20,right: 20,top: 30),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: List.generate(_tabs.length, (index){
                     return GestureDetector(
                       onTap: (){
@@ -105,6 +120,7 @@ class _HomePageState extends State<HomePage> {
                         _todosController.getTodos(_tabs[selectedTab]);
                       },
                       child: Container(
+                      margin: const EdgeInsets.only(right: 5),
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
