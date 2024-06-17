@@ -24,9 +24,11 @@ class _HomePageState extends State<HomePage> {
   final List<String> _images = [
     "assets/images/personal.png",
     "assets/images/family.png",
+    "assets/images/business.png",
     "assets/images/business.png"
   ];
-  final List<String> _tabs = ["Personal","Family","Business"];
+  final List<String> _tabs = ["Personal","Family","Business","Others"];
+  final List<String> _colors = ["#b4c5fe","#fff57f","#cff2e8","#ffc1f4"];
   int selectedTab = 0;
   @override
   void initState() {
@@ -109,38 +111,61 @@ class _HomePageState extends State<HomePage> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 20,right: 20,top: 30),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: List.generate(_tabs.length, (index){
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 5.0,
+                    childAspectRatio: 1.7,
+                  ),
+                  itemCount: _colors.length,
+                  itemBuilder: (context,index){
                     return GestureDetector(
                       onTap: (){
-                        setState(() {
-                          selectedTab = index;
-                        });
-                        _todosController.getTodos(_tabs[selectedTab]);
+                        _todosController.getTodos(_tabs[index]);
                       },
                       child: Container(
-                      margin: const EdgeInsets.only(right: 5),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: selectedTab == index ?
-                        Colors.green : Colors.green.shade300,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          color: Color(hexStringToHexInt(_colors[index])),
+                        ),
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Expanded(child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 5),
+                                    width: 45,
+                                    height: 45,
+                                    decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.white
+                                    ),
+                                    child: Center(child: Image.asset(_images[index],width: 25,height: 25,),),
+                                  ),
+                                  const Gap(10),
+                                  Text(_tabs[index],style: getMedFont().copyWith(fontSize: 18),)
+                                ],
+                              ),),
+                            ),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.bottomRight,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Text("5",style: getMedFont().copyWith(fontSize: 23)),
+                                ),
+                              ),)
+                          ],
+                        ),
                       ),
-                      child: Center(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                           children: [
-                          Text(_tabs[index],style: getMedFont().copyWith(fontSize: 14,color:
-                          selectedTab == index ?  Colors.white : Colors.black54),),
-                          const Gap(5),
-                          Image.asset(_images[index],width: 20,height: 20,color: Colors.white,)
-                        ],
-                      )),
-                                            ),
                     );
-                  }).toList(),
+                  },
                 ),
               ),
               Padding(
@@ -204,10 +229,10 @@ class _HomePageState extends State<HomePage> {
                                   });
                                 },
                                 child: Card(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                                   color: Color(hexStringToHexInt(data[index].color)),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(15.0),
                                     child: Row(
                                       children: [
                                         Expanded(child: Column(

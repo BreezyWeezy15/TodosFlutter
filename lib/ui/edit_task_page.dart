@@ -47,9 +47,10 @@ class _EditTaskPageState extends State<EditTaskPage> {
   final List<String> _images = [
     "assets/images/personal.png",
     "assets/images/family.png",
-    "assets/images/business.png"
+    "assets/images/business.png",
+    "assets/images/others.png"
   ];
-  final List<String> _categories = ["Personal","Family","Business"];
+  final List<String> _categories = ["Personal","Family","Business","Others"];
   @override
   void initState() {
     super.initState();
