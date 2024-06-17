@@ -12,11 +12,15 @@ class TodosHelper {
 
   static const String table = "_todos";
   static const String columnTaskId = "_id";
+  static const String columnAlarmID = "_alarmID";
   static const String columnTaskTitle =  "_title";
   static const String columnTaskDate = "_date";
   static const String columnTaskTime = "_time";
   static const String columnColor = "_color";
   static const String columnTimeStamp = "_timeStamp";
+  static const String columnCategory =  "_category";
+  static const String columnColorIndex =  "_colorIndex";
+  static const String columnCategoryIndex =  "_categoryIndex";
 
   // make this a singleton class
   TodosHelper._privateConstructor();
@@ -35,11 +39,15 @@ class TodosHelper {
       await db.execute('''
       CREATE TABLE $table (
         $columnTaskId INTEGER PRIMARY KEY,
+        $columnAlarmID INTEGER NOT NULL,
         $columnTaskTitle TEXT NOT NULL,
         $columnTaskDate TEXT NOT NULL,
         $columnTaskTime TEXT NOT NULL,
         $columnColor TEXT NOT NULL,
-        $columnTimeStamp INTEGER NOT NULL
+        $columnTimeStamp INTEGER NOT NULL,
+        $columnCategory TEXT NOT NULL,
+        $columnColorIndex INTEGER NOT NULL,
+        $columnCategoryIndex INTEGER NOT NULL
       )
       ''');
     });

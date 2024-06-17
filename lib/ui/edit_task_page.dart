@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
@@ -16,11 +17,16 @@ import '../utils.dart';
 
 class EditTaskPage extends StatefulWidget {
   final int taskID;
+  final int alarmID;
   final String task;
   final String date;
   final String time;
   final String color;
-  const EditTaskPage({super.key,required this.taskID,required this.task,required this.date,required this.time,required this.color});
+  final String category;
+  final int selectedColorIndex;
+  final int selectedCategoryIndex;
+  const EditTaskPage({super.key,required this.alarmID,required this.taskID,required this.task,required this.date,required this.time,
+    required this.color,required this.category,required this.selectedColorIndex,required this.selectedCategoryIndex});
 
   @override
   State<EditTaskPage> createState() => _EditTaskPageState();
@@ -31,10 +37,12 @@ class _EditTaskPageState extends State<EditTaskPage> {
   var pickedDate = "";
   var pickedTime = "";
   var pickedColor = "";
+  var pickedCategory = "";
   late DateTime dateStamp;
   late TimeOfDay timeStamp;
   var fullDate = 0;
   var selectedColorIndex = 0;
+  var selectedCategoryIndex = 0;
   static final TextEditingController _taskController = TextEditingController();
   static final TextEditingController _dateController = TextEditingController();
   static final TextEditingController _timeController = TextEditingController();
@@ -50,10 +58,13 @@ class _EditTaskPageState extends State<EditTaskPage> {
       _dateController.text = widget.date;
       _timeController.text = widget.time;
       pickedColor = widget.color;
+      pickedCategory = widget.category;
       pickedDate = widget.date;
       pickedTime = widget.time;
       dateStamp = parseDate(widget.date);
       timeStamp = parseTime(widget.time);
+      selectedColorIndex = widget.selectedColorIndex;
+      selectedCategoryIndex = widget.selectedCategoryIndex;
     });
   }
 
@@ -227,23 +238,24 @@ class _EditTaskPageState extends State<EditTaskPage> {
                       return;
                     }
 
-
+                    var alarmId = int.parse(DateTime.now().microsecondsSinceEpoch.toString().substring(0,5));
                     TaskModel taskModel = TaskModel(
-                      id: widget.taskID,
+                      id: alarmId,
+                      alarmId: alarmId,
                       title: task,
                       date: pickedDate,
                       time: pickedTime,
                       color: pickedColor,
                       timeStamp: combineDateTime(dateStamp, timeStamp).millisecondsSinceEpoch,
+                      category: pickedCategory,
+                      colorIndex: selectedColorIndex,
+                      categoryIndex: selectedCategoryIndex
                     );
                     int? result = await _todosController.updateTask(taskModel);
-                    print("Date is " + date + result.toString());
                     if (result == 1) {
+                      await Alarm.stop(alarmId);
                       Fluttertoast.showToast(msg: "Task Updated Successfully successfully");
-                      setState(() {
-                        pickedColor = "";
-                      });
-                      await createAlarm();
+                      await createAlarm(int.parse(alarmId.toString().substring(0,5)));
                     } else {
                       Fluttertoast.showToast(msg: "Failed to add task");
                     }
@@ -257,7 +269,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
                         color: Colors.blueGrey,
                       ),
                       child: Center(
-                        child: Text("Add Task", style: getMedFont().copyWith(color: Colors.white)),
+                        child: Text("Edit Task", style: getMedFont().copyWith(color: Colors.white)),
                       ),
                     ),
                   ),
@@ -283,9 +295,9 @@ class _EditTaskPageState extends State<EditTaskPage> {
       timeOfDay.minute,
     );
   }
-  Future createAlarm() async {
+  Future createAlarm(int alarmId) async {
     final alarmSettings = AlarmSettings(
-      id: 42,
+      id: alarmId,
       dateTime: combineDateTime(dateStamp, timeStamp),
       assetAudioPath: 'assets/audios/notification.mp3',
       loopAudio: false,
@@ -300,6 +312,9 @@ class _EditTaskPageState extends State<EditTaskPage> {
     _taskController.clear();
     _dateController.clear();
     _timeController.clear();
+    setState(() {
+      pickedColor = "";
+    });
   }
 
   DateTime parseDate(String date){

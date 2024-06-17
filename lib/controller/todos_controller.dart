@@ -24,6 +24,7 @@ class TodosController extends GetxController {
       if(data!.isNotEmpty){
         rxList.addAll(data);
         isLoading.value = false;
+        print("Value ${data[0].alarmId}");
       } else {
         error.value = "No Tasks Found";
         isLoading.value = false;

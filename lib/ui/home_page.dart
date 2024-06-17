@@ -1,3 +1,4 @@
+import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -64,6 +65,7 @@ class _HomePageState extends State<HomePage> {
                                     int? result = await _todosController.deleteAllTasks();
                                     if(result! > 1){
                                       Fluttertoast.showToast(msg: "Tasks removed successfully");
+                                       Alarm.getAlarms().clear();
                                       _todosController.getTodos();
                                       if(context.mounted) Navigator.pop(context);
                                     } else {
@@ -89,14 +91,8 @@ class _HomePageState extends State<HomePage> {
                 child: Obx(() {
                   if (_todosController.isLoading.value) {
                     return SizedBox(
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width,
-                      height: MediaQuery
-                          .of(context)
-                          .size
-                          .height,
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
                       child: const Center(
                         child: CircularProgressIndicator(),
                       ),
@@ -111,20 +107,21 @@ class _HomePageState extends State<HomePage> {
                       ),
                     );
                   }
-                  else if (_todosController.rxList != null) {
+                  else if (_todosController.rxList.isNotEmpty) {
                     var data = _todosController.rxList;
                     return SizedBox(
                       height: MediaQuery.of(context).size.height,
                       child: ListView.builder(
-                        itemCount: data?.length,
+                        itemCount: data.length,
                         itemBuilder: (context, index) {
                           return Dismissible(
                               key: UniqueKey(),
                               direction: DismissDirection.startToEnd,
                               onDismissed: (direction) async {
                                 // onDismiss
-                                int? result = await _todosController.deleteTask(data[index]!);
+                                int? result = await _todosController.deleteTask(data[index]);
                                 if(result == 1){
+                                  await Alarm.stop(data[index].alarmId);
                                   Fluttertoast.showToast(msg: "Task successfully removed");
                                 } else {
                                   Fluttertoast.showToast(msg: "Failed to remove task");
@@ -134,17 +131,24 @@ class _HomePageState extends State<HomePage> {
                                 onTap: (){
                                   // edit values
                                   int taskID = data[index].id;
+                                  int alarmId = data[index].alarmId;
                                   String task = data[index].title;
                                   String date = data[index].date;
                                   String time = data[index].time;
                                   String color = data[index].color;
+                                  String category = data[index].category;
+                                  int colorIndex = data[index].colorIndex;
+                                  int categoryIndex = data[index].categoryIndex;
 
-
-                                  Navigator.push(context, MaterialPageRoute(builder: (_) =>  EditTaskPage(taskID : taskID , task: task, date: date, time: time, color: color)));
+                                  Navigator.push(context, MaterialPageRoute(builder: (_) =>  EditTaskPage(taskID : taskID , alarmID: alarmId,
+                                      task: task, date: date, time: time, color: color,category: category,
+                                     selectedColorIndex: colorIndex,selectedCategoryIndex: categoryIndex,))).then((value){
+                                         _todosController.getTodos();
+                                  });
                                 },
                                 child: Card(
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                  color: Color(hexStringToHexInt(data![index]!.color)),
+                                  color: Color(hexStringToHexInt(data[index].color)),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Row(
@@ -152,9 +156,9 @@ class _HomePageState extends State<HomePage> {
                                         Expanded(child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(data[index]!.title, style: getBoldFont().copyWith(fontSize: 18, color: Colors.white),),
-                                            Text("Date : ${data[index]!.date}", style: getMedFont().copyWith(fontSize: 15, color: Colors.white),),
-                                            Text("Time : ${data[index]!.time}", style: getMedFont().copyWith(fontSize: 15, color: Colors.white),)
+                                            Text(data[index].title, style: getBoldFont().copyWith(fontSize: 18, color: Colors.white),),
+                                            Text("Date : ${data[index].date}", style: getMedFont().copyWith(fontSize: 15, color: Colors.white),),
+                                            Text("Time : ${data[index].time}", style: getMedFont().copyWith(fontSize: 15, color: Colors.white),)
                                           ],
                                         )),
                                         GestureDetector(
@@ -170,6 +174,7 @@ class _HomePageState extends State<HomePage> {
                                                       ElevatedButton(onPressed: () async {
                                                         int? result = await _todosController.deleteTask(data[index]!);
                                                         if(result == 1){
+                                                          await Alarm.stop(data[index].alarmId);
                                                           Fluttertoast.showToast(msg: "Task successfully removed");
                                                           if(context.mounted) Navigator.pop(context);
                                                         } else {
