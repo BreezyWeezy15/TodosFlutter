@@ -6,20 +6,27 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
-import 'package:todos_app/controller/todos_controller.dart';
-import 'package:todos_app/models/task_model.dart';
-import 'package:todos_app/notification_helper.dart';
-import 'package:todos_app/utils.dart';
 
-class TasksDetails extends StatefulWidget {
-  const TasksDetails({super.key});
+import '../controller/todos_controller.dart';
+import '../models/task_model.dart';
+import '../notification_helper.dart';
+import '../utils.dart';
+
+class EditTaskPage extends StatefulWidget {
+  final int taskID;
+  final String task;
+  final String date;
+  final String time;
+  final String color;
+  const EditTaskPage({super.key,required this.taskID,required this.task,required this.date,required this.time,required this.color});
 
   @override
-  State<TasksDetails> createState() => _TasksDetailsState();
+  State<EditTaskPage> createState() => _EditTaskPageState();
 }
 
-class _TasksDetailsState extends State<TasksDetails> {
+class _EditTaskPageState extends State<EditTaskPage> {
   late TodosController _todosController;
   var pickedDate = "";
   var pickedTime = "";
@@ -39,7 +46,14 @@ class _TasksDetailsState extends State<TasksDetails> {
     _todosController = Get.find();
     NotificationHelper.initializePlatformSpecifics();
     setState(() {
-
+      _taskController.text  = widget.task;
+      _dateController.text = widget.date;
+      _timeController.text = widget.time;
+      pickedColor = widget.color;
+      pickedDate = widget.date;
+      pickedTime = widget.time;
+      dateStamp = parseDate(widget.date);
+      timeStamp = parseTime(widget.time);
     });
   }
 
@@ -62,7 +76,7 @@ class _TasksDetailsState extends State<TasksDetails> {
                       child: Image.asset("assets/images/arrow.png", width: 30, height: 30),
                     ),
                     const Gap(5),
-                    Text("Add Task", style: getBoldFont().copyWith(fontSize: 35)),
+                    Text("Edit Task", style: getBoldFont().copyWith(fontSize: 35)),
                   ],
                 ),
               ),
@@ -213,18 +227,19 @@ class _TasksDetailsState extends State<TasksDetails> {
                       return;
                     }
 
+
                     TaskModel taskModel = TaskModel(
-                      id: DateTime.now().microsecondsSinceEpoch,
+                      id: widget.taskID,
                       title: task,
                       date: pickedDate,
                       time: pickedTime,
                       color: pickedColor,
                       timeStamp: combineDateTime(dateStamp, timeStamp).millisecondsSinceEpoch,
                     );
-
-                    int? result = await _todosController.insertTask(taskModel);
-                    if (result != 1) {
-                      Fluttertoast.showToast(msg: "Task added successfully");
+                    int? result = await _todosController.updateTask(taskModel);
+                    print("Date is " + date + result.toString());
+                    if (result == 1) {
+                      Fluttertoast.showToast(msg: "Task Updated Successfully successfully");
                       setState(() {
                         pickedColor = "";
                       });
@@ -287,4 +302,14 @@ class _TasksDetailsState extends State<TasksDetails> {
     _timeController.clear();
   }
 
+  DateTime parseDate(String date){
+    DateTime dateTime = DateTime.parse(date);
+    return  dateTime;
+  }
+  TimeOfDay parseTime(String time){
+    final parts = time.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = int.parse(parts[1]);
+    return TimeOfDay(hour: hour, minute: minute);
+  }
 }

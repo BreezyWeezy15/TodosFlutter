@@ -69,7 +69,12 @@ class TodosHelper {
   }
   Future<int?> updateTodo(TaskModel taskModel) async {
     var db = await createDB();
-    return await db?.update(table, taskModel.toJson());
+    return await db?.update(
+        table,
+        taskModel.toJson(),
+        where: "_id = ?",
+        whereArgs: [taskModel.id]
+    );
   }
 
 }

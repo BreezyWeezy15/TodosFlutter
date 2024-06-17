@@ -5,9 +5,10 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:receive_intent/receive_intent.dart';
 import 'package:todos_app/controller/todos_controller.dart';
+import 'package:todos_app/ui/edit_task_page.dart';
 import 'package:todos_app/utils.dart';
 import 'details_page.dart';
-
+import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _todosController = Get.put(TodosController());
+    handlePermission();
   }
 
   @override
@@ -128,53 +130,66 @@ class _HomePageState extends State<HomePage> {
                                   Fluttertoast.showToast(msg: "Failed to remove task");
                                 }
                               },
-                              child: Card(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                color: Color(hexStringToHexInt(data![index]!.color)),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    children: [
-                                      Expanded(child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(data[index]!.title, style: getBoldFont().copyWith(fontSize: 18, color: Colors.white),),
-                                          Text("Date : ${data[index]!.date}", style: getMedFont().copyWith(fontSize: 15, color: Colors.white),),
-                                          Text("Time : ${data[index]!.time}", style: getMedFont().copyWith(fontSize: 15, color: Colors.white),)
-                                        ],
-                                      )),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context){
-                                                return AlertDialog(
-                                                  title: Text("Remove task",style: getBoldFont().copyWith(fontSize: 20),),
-                                                  content: Text("Are you sure you want to remove task?",
-                                                  style: getBoldFont().copyWith(fontSize: 20),),
-                                                  actions: [
-                                                    ElevatedButton(onPressed: () async {
-                                                      int? result = await _todosController.deleteTask(data[index]!);
-                                                      if(result == 1){
-                                                        Fluttertoast.showToast(msg: "Task successfully removed");
-                                                        if(context.mounted) Navigator.pop(context);
-                                                      } else {
-                                                        Fluttertoast.showToast(msg: "Failed to remove task");
-                                                        if(context.mounted) Navigator.pop(context);
-                                                      }
-                                                    }, child: Text("Yes",style: getBoldFont(),)),
-                                                    ElevatedButton(onPressed: (){
-                                                       Navigator.pop(context);
-                                                    }, child: Text("No",style: getBoldFont(),))
-                                                  ],
-                                                );
-                                              });
-                                        },
-                                        child: const Icon(
-                                          Icons.delete_outline, size: 25,
-                                          color: Colors.white,),
-                                      )
-                                    ],
+                              child: GestureDetector(
+                                onTap: (){
+                                  // edit values
+                                  int taskID = data[index].id;
+                                  String task = data[index].title;
+                                  String date = data[index].date;
+                                  String time = data[index].time;
+                                  String color = data[index].color;
+
+
+                                  Navigator.push(context, MaterialPageRoute(builder: (_) =>  EditTaskPage(taskID : taskID , task: task, date: date, time: time, color: color)));
+                                },
+                                child: Card(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  color: Color(hexStringToHexInt(data![index]!.color)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      children: [
+                                        Expanded(child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(data[index]!.title, style: getBoldFont().copyWith(fontSize: 18, color: Colors.white),),
+                                            Text("Date : ${data[index]!.date}", style: getMedFont().copyWith(fontSize: 15, color: Colors.white),),
+                                            Text("Time : ${data[index]!.time}", style: getMedFont().copyWith(fontSize: 15, color: Colors.white),)
+                                          ],
+                                        )),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context){
+                                                  return AlertDialog(
+                                                    title: Text("Remove task",style: getBoldFont().copyWith(fontSize: 20),),
+                                                    content: Text("Are you sure you want to remove task?",
+                                                      style: getBoldFont().copyWith(fontSize: 20),),
+                                                    actions: [
+                                                      ElevatedButton(onPressed: () async {
+                                                        int? result = await _todosController.deleteTask(data[index]!);
+                                                        if(result == 1){
+                                                          Fluttertoast.showToast(msg: "Task successfully removed");
+                                                          if(context.mounted) Navigator.pop(context);
+                                                        } else {
+                                                          Fluttertoast.showToast(msg: "Failed to remove task");
+                                                          if(context.mounted) Navigator.pop(context);
+                                                        }
+                                                      }, child: Text("Yes",style: getBoldFont(),)),
+                                                      ElevatedButton(onPressed: (){
+                                                        Navigator.pop(context);
+                                                      }, child: Text("No",style: getBoldFont(),))
+                                                    ],
+                                                  );
+                                                });
+                                          },
+                                          child: const Icon(
+                                            Icons.delete_outline, size: 25,
+                                            color: Colors.white,),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ));
@@ -197,54 +212,14 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  void fireNotification() async {
-    var receivedIntent = await ReceiveIntent.getInitialIntent();
-    if (receivedIntent?.action == "android.intent.action.MAIN") {
-      final paramsExtra = receivedIntent!.extra?["params"];
-      var param1 = paramsExtra["param1"];
-      var param2 = paramsExtra["param2"];
-      //showNotification(param1, param2);
-      // show notification
-    }
+  void handlePermission() async {
+     var status  = await Permission.notification.status;
+     if(status == PermissionStatus.denied || status == PermissionStatus.permanentlyDenied){
+         Fluttertoast.showToast(msg: "Please grant permission");
+         await Permission.notification.request();
+     }
+     else  if(status == PermissionStatus.granted){
+       Fluttertoast.showToast(msg: "Permission Granted");
+     }
   }
-  // initializePlatformSpecifics() async {
-  //   var initializationSettingsAndroid = const AndroidInitializationSettings(
-  //       '@mipmap/ic_launcher');
-  //   var initializationSettingsIOS = DarwinInitializationSettings(
-  //     requestAlertPermission: true,
-  //     requestBadgePermission: true,
-  //     requestSoundPermission: false,
-  //     onDidReceiveLocalNotification: (id, title, body, payload) async {
-  //       // your call back to the UI
-  //     },
-  //   );
-  //   InitializationSettings initializationSettings = InitializationSettings(
-  //       android: initializationSettingsAndroid,
-  //       iOS: initializationSettingsIOS);
-  //   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  //   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  // }
-  // Future<void> showNotification(String param1, String param2) async {
-  //   var androidChannelSpecifics = const AndroidNotificationDetails(
-  //     'CHANNEL_ID',
-  //     'CHANNEL_NAME',
-  //     importance: Importance.max,
-  //     priority: Priority.high,
-  //     playSound: true,
-  //     timeoutAfter: 5000,
-  //     styleInformation: DefaultStyleInformation(true, true),
-  //   );
-  //   var iosChannelSpecifics = const DarwinNotificationDetails();
-  //   var platformChannelSpecifics = NotificationDetails(
-  //       android: androidChannelSpecifics,
-  //       iOS: iosChannelSpecifics
-  //   );
-  //   await flutterLocalNotificationsPlugin.show(
-  //       0, // Notification ID
-  //       param1, // Notification Title
-  //       param2, // Notification Body, set as null to remove the body
-  //       platformChannelSpecifics,
-  //       payload: 'New Payload');
-  // }
 }
