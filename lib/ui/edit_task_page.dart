@@ -43,7 +43,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
   static final TextEditingController _taskController = TextEditingController();
   static final TextEditingController _dateController = TextEditingController();
   static final TextEditingController _timeController = TextEditingController();
-  final List<String> _colors = ["#154a54", "#ff8f38", "#111827", "#ff4500", "#743747", "#467966"];
+  final List<String> _colors = ["#f3f6f4", "#f1e8ce", "#f5f5dc", "#fceee2", "#94b1ff", "#93e9be"];
   final List<String> _images = [
     "assets/images/personal.png",
     "assets/images/family.png",
@@ -287,7 +287,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
                     }
                     var alarmId = int.parse(DateTime.now().microsecondsSinceEpoch.toString().substring(0,5));
                     TaskModel taskModel = TaskModel(
-                      id: DateTime.now().microsecondsSinceEpoch,
+                      id: widget.taskID,
                       alarmID: alarmId,
                       title: task,
                       date: pickedDate,

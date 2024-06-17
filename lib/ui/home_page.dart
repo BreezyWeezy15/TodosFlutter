@@ -1,10 +1,11 @@
+import 'dart:ffi';
+
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:receive_intent/receive_intent.dart';
 import 'package:todos_app/controller/todos_controller.dart';
 import 'package:todos_app/ui/edit_task_page.dart';
 import 'package:todos_app/utils.dart';
@@ -25,16 +26,16 @@ class _HomePageState extends State<HomePage> {
     "assets/images/personal.png",
     "assets/images/family.png",
     "assets/images/business.png",
-    "assets/images/business.png"
+    "assets/images/others.png"
   ];
   final List<String> _tabs = ["Personal","Family","Business","Others"];
   final List<String> _colors = ["#b4c5fe","#fff57f","#cff2e8","#ffc1f4"];
-  int selectedTab = 0;
   @override
   void initState() {
     super.initState();
     _todosController = Get.put(TodosController());
     handlePermission();
+    _todosController.getTodos(_tabs[0]);
   }
 
   @override
@@ -53,7 +54,7 @@ class _HomePageState extends State<HomePage> {
                     GestureDetector(
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (_) => const TasksDetails())).then((value){
-                             _todosController.getTodos(_tabs[selectedTab]);
+                             _todosController.getTodos("Personal");
                         });
                       },
                       child: Container(
@@ -116,7 +117,8 @@ class _HomePageState extends State<HomePage> {
                   scrollDirection: Axis.vertical,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    mainAxisSpacing: 5.0,
+                    mainAxisSpacing: 10.0,
+                    crossAxisSpacing: 10.0,
                     childAspectRatio: 1.7,
                   ),
                   itemCount: _colors.length,
@@ -134,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(10),
-                              child: Expanded(child: Column(
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
@@ -151,16 +153,8 @@ class _HomePageState extends State<HomePage> {
                                   const Gap(10),
                                   Text(_tabs[index],style: getMedFont().copyWith(fontSize: 18),)
                                 ],
-                              ),),
-                            ),
-                            Expanded(
-                              child: Align(
-                                alignment: Alignment.bottomRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Text("5",style: getMedFont().copyWith(fontSize: 23)),
-                                ),
-                              ),)
+                              ),
+                            )
                           ],
                         ),
                       ),
@@ -172,6 +166,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(10),
                 child: Obx(() {
                   if (_todosController.isLoading.value) {
+                    print("BLOCK : 1");
                     return SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
@@ -180,18 +175,10 @@ class _HomePageState extends State<HomePage> {
                       ),
                     );
                   }
-                  else if (_todosController.error.value != null) {
-                    return SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height / 1.2,
-                      child: Center(
-                        child: Text(_todosController.error.value!,style: getBoldFont().copyWith(fontSize: 25),),
-                      ),
-                    );
-                  }
-                  else if (_todosController.rxList.isNotEmpty) {
+                  if (_todosController.rxList.isNotEmpty) {
                     var data = _todosController.rxList;
-                    return SizedBox(
+                    return Container(
+                      margin: const EdgeInsets.all(10),
                       height: MediaQuery.of(context).size.height,
                       child: ListView.builder(
                         itemCount: data.length,
@@ -204,6 +191,7 @@ class _HomePageState extends State<HomePage> {
                                 int? result = await _todosController.deleteTask(data[index]);
                                 if(result == 1){
                                   await Alarm.stop(data[index].alarmID);
+                                  _todosController.getTodos(data[index].category);
                                   Fluttertoast.showToast(msg: "Task successfully removed");
                                 } else {
                                   Fluttertoast.showToast(msg: "Failed to remove task");
@@ -225,7 +213,7 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.push(context, MaterialPageRoute(builder: (_) =>  EditTaskPage(taskID : taskID! , alarmID: alarmId,
                                       task: task, date: date, time: time, color: color,category: category,
                                      selectedColorIndex: colorIndex,selectedCategoryIndex: categoryIndex,))).then((value){
-                                       _todosController.getTodos(_tabs[selectedTab]);
+                                       _todosController.getTodos(_tabs[index]);
                                   });
                                 },
                                 child: Card(
@@ -257,6 +245,7 @@ class _HomePageState extends State<HomePage> {
                                                         int? result = await _todosController.deleteTask(data[index]!);
                                                         if(result == 1){
                                                           await Alarm.stop(data[index].alarmID);
+                                                          _todosController.getTodos(data[index].category);
                                                           Fluttertoast.showToast(msg: "Task successfully removed");
                                                           if(context.mounted) Navigator.pop(context);
                                                         } else {
@@ -286,7 +275,7 @@ class _HomePageState extends State<HomePage> {
                   }
                   return SizedBox(
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height / 1.2,
+                    height: MediaQuery.of(context).size.height / 1.5,
                     child: Center(
                       child: Text("No Tasks Found",style: getBoldFont().copyWith(fontSize: 25)),
                     ),
@@ -306,7 +295,6 @@ class _HomePageState extends State<HomePage> {
          await Permission.notification.request();
      }
      else  if(status == PermissionStatus.granted){
-       Fluttertoast.showToast(msg: "Permission Granted");
      }
   }
 }

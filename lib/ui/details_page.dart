@@ -24,7 +24,7 @@ class _TasksDetailsState extends State<TasksDetails> {
   var pickedDate = "";
   var pickedTime = "";
   var pickedColor = "";
-  var pickedCategory = "";
+  var pickedCategory = "Personal";
   late DateTime dateStamp;
   late TimeOfDay timeStamp;
   var fullDate = 0;
@@ -33,7 +33,7 @@ class _TasksDetailsState extends State<TasksDetails> {
   static final TextEditingController _taskController = TextEditingController();
   static final TextEditingController _dateController = TextEditingController();
   static final TextEditingController _timeController = TextEditingController();
-  final List<String> _colors = ["#154a54", "#ff8f38", "#111827", "#ff4500", "#743747", "#467966"];
+  final List<String> _colors = ["#f3f6f4", "#f1e8ce", "#f5f5dc", "#fceee2", "#94b1ff", "#93e9be"];
   final List<String> _images = [
     "assets/images/personal.png",
     "assets/images/family.png",
@@ -45,10 +45,6 @@ class _TasksDetailsState extends State<TasksDetails> {
   void initState() {
     super.initState();
     _todosController = Get.find();
-    NotificationHelper.initializePlatformSpecifics();
-    setState(() {
-
-    });
   }
 
   @override
@@ -338,7 +334,6 @@ class _TasksDetailsState extends State<TasksDetails> {
       assetAudioPath: 'assets/audios/notification.mp3',
       loopAudio: false,
       vibrate: false,
-      volume: 0.8,
       fadeDuration: 3.0,
       notificationTitle: 'Task is ready!',
       notificationBody: _taskController.text.toString(),

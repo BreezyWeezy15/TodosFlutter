@@ -8,30 +8,20 @@ class TodosController extends GetxController {
   final TodosService _todosService = TodosService();
   RxList<TaskModel> rxList = RxList<TaskModel>();
   Rx<bool> isLoading = Rx(false);
-  Rx<String?> error = Rx(null);
-
-  @override
-  void onInit() {
-    super.onInit();
-    getTodos("Personal");
-  }
 
   void getTodos(String category) async {
-    isLoading.value = true;
     rxList.clear();
-    try {
-      var data = await _todosService.getTodos(category);
-      if(data!.isNotEmpty){
-        rxList.addAll(data);
-        isLoading.value = false;
-      } else {
-        error.value = "No Tasks Found";
-        isLoading.value = false;
-      }
-    } catch (e) {
+    isLoading.value = true;
+    var data = await _todosService.getTodos(category);
+    if (data!.isEmpty) {
       isLoading.value = false;
-      error.value = e.toString();
+    } else {
+      rxList.addAll(data!);
+      rxList.refresh();
+      isLoading.value = false;
     }
+
+
   }
   Future<int?> insertTask(TaskModel taskModel) async {
     return await _todosService.insertTask(taskModel);
