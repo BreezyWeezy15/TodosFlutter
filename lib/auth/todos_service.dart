@@ -6,8 +6,8 @@ import 'package:todos_app/models/task_model.dart';
 
 class TodosService {
 
-   Future<List<TaskModel>?> getTodos() async {
-     return await todosHelper.getTodos();
+   Future<List<TaskModel>?> getTodos(String category) async {
+     return await todosHelper.getTodos(category);
    }
    Future<int?> insertTask(TaskModel taskModel) async {
      return await todosHelper.insertTodo(taskModel);

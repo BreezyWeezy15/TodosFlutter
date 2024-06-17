@@ -13,16 +13,15 @@ class TodosController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getTodos();
+    getTodos("Personal");
   }
 
-  void getTodos() async {
+  void getTodos(String category) async {
     isLoading.value = true;
     rxList.clear();
     try {
-      var data = await _todosService.getTodos();
+      var data = await _todosService.getTodos(category);
       if(data!.isNotEmpty){
-        print("Value Posted ${data[0].alarmID}");
         rxList.addAll(data);
         isLoading.value = false;
       } else {

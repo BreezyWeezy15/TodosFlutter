@@ -21,7 +21,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   late TodosController _todosController;
-
+  final List<String> _images = [
+    "assets/images/personal.png",
+    "assets/images/family.png",
+    "assets/images/business.png"
+  ];
+  final List<String> _tabs = ["Personal","Family","Business"];
+  int selectedTab = 0;
   @override
   void initState() {
     super.initState();
@@ -45,7 +51,7 @@ class _HomePageState extends State<HomePage> {
                     GestureDetector(
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (_) => const TasksDetails())).then((value){
-                             _todosController.getTodos();
+                             _todosController.getTodos(_tabs[selectedTab]);
                         });
                       },
                       child: const Icon(Icons.add, size: 30,),
@@ -66,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                                     if(result! > 1){
                                       Fluttertoast.showToast(msg: "Tasks removed successfully");
                                        Alarm.getAlarms().clear();
-                                      _todosController.getTodos();
+                                      _todosController.getTodos("Personal");
                                       if(context.mounted) Navigator.pop(context);
                                     } else {
                                       Fluttertoast.showToast(msg: "Failed to remove tasks");
@@ -84,6 +90,41 @@ class _HomePageState extends State<HomePage> {
                         Icons.delete_forever_rounded, size: 30,),
                     )
                   ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20,right: 20,top: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: List.generate(_tabs.length, (index){
+                    return GestureDetector(
+                      onTap: (){
+                        setState(() {
+                          selectedTab = index;
+                        });
+                        _todosController.getTodos(_tabs[selectedTab]);
+                      },
+                      child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: selectedTab == index ?
+                        Colors.green : Colors.green.shade300,
+                      ),
+                      child: Center(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                           children: [
+                          Text(_tabs[index],style: getMedFont().copyWith(fontSize: 14,color:
+                          selectedTab == index ?  Colors.white : Colors.black54),),
+                          const Gap(5),
+                          Image.asset(_images[index],width: 20,height: 20,color: Colors.white,)
+                        ],
+                      )),
+                                            ),
+                    );
+                  }).toList(),
                 ),
               ),
               Padding(
@@ -143,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.push(context, MaterialPageRoute(builder: (_) =>  EditTaskPage(taskID : taskID! , alarmID: alarmId,
                                       task: task, date: date, time: time, color: color,category: category,
                                      selectedColorIndex: colorIndex,selectedCategoryIndex: categoryIndex,))).then((value){
-                                         _todosController.getTodos();
+                                       _todosController.getTodos(_tabs[selectedTab]);
                                   });
                                 },
                                 child: Card(

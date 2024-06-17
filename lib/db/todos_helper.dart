@@ -56,9 +56,13 @@ class TodosHelper {
      var db = await createDB();
      return await db?.insert(table, taskModel.toJson());
   }
-  Future<List<TaskModel>?>getTodos() async {
+  Future<List<TaskModel>?>getTodos(String category) async {
     var db = await createDB();
-    var data =  await db?.query(table);
+    var data =  await db?.query(
+      table,
+      where: "_category = ?",
+      whereArgs: [category]
+    );
     var values = data?.map((e) => TaskModel.fromJson(e)).toList();
     return values;
   }
