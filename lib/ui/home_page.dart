@@ -8,6 +8,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:todos_app/controller/todos_controller.dart';
 import 'package:todos_app/ui/edit_task_page.dart';
+import 'package:todos_app/ui/settings_page.dart';
 import 'package:todos_app/utils.dart';
 import 'details_page.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -42,6 +43,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage())).then((value){
+               _todosController.getTodos("Personal");
+            });
+          },
+          backgroundColor: Colors.black26,
+          child: const Icon(Icons.settings,size: 25,color: Colors.white,),
+        ),
         body: SingleChildScrollView(
           child: Column(
             children: [
