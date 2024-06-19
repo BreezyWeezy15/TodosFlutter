@@ -9,6 +9,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:todos_app/controller/todos_controller.dart';
 import 'package:todos_app/languages/locale_keys.g.dart';
+import 'package:todos_app/storage/storage_helper.dart';
 import 'package:todos_app/ui/edit_task_page.dart';
 import 'package:todos_app/ui/settings_page.dart';
 import 'package:todos_app/utils.dart';
@@ -165,7 +166,8 @@ class _HomePageState extends State<HomePage> {
                                     child: Center(child: Image.asset(_images[index],width: 25,height: 25,),),
                                   ),
                                   const Gap(10),
-                                  Text(_translations[index],style: getMedFont().copyWith(fontSize: 18),)
+                                  Text(_translations[index],style: getMedFont().copyWith(fontSize: 18,
+                                  color: StorageHelper.getCurrentMode() == true ? Colors.grey : Colors.black,))
                                 ],
                               ),
                             )

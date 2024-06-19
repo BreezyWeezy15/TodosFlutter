@@ -51,7 +51,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     onTap: (){
                       Navigator.pop(context);
                     },
-                    child: Image.asset("assets/images/arrow.png",width: 25,height: 25,),
+                    child: Image.asset("assets/images/arrow.png",width: 25,height: 25,
+                        color: StorageHelper.getCurrentMode() == true ? Colors.white : Colors.grey,),
                   ),
                   const Gap(5),
                   Text(LocaleKeys.settings.tr(),style: getBoldFont().copyWith(fontSize: 20),)
