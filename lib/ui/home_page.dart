@@ -1,12 +1,14 @@
 import 'dart:ffi';
 
 import 'package:alarm/alarm.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Trans;
 import 'package:todos_app/controller/todos_controller.dart';
+import 'package:todos_app/languages/locale_keys.g.dart';
 import 'package:todos_app/ui/edit_task_page.dart';
 import 'package:todos_app/ui/settings_page.dart';
 import 'package:todos_app/utils.dart';
@@ -29,6 +31,7 @@ class _HomePageState extends State<HomePage> {
     "assets/images/business.png",
     "assets/images/others.png"
   ];
+  late List<String> _translations;
   final List<String> _tabs = ["Personal","Family","Business","Others"];
   final List<String> _colors = ["#b4c5fe","#fff57f","#cff2e8","#ffc1f4"];
   @override
@@ -41,6 +44,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    _translations = getTranslations();
     return SafeArea(
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
@@ -60,7 +64,7 @@ class _HomePageState extends State<HomePage> {
                 child: Row(
                   children: [
                     Expanded(child: Text(
-                      "Tasks", style: getBoldFont().copyWith(fontSize: 25),)),
+                      LocaleKeys.tasks.tr(), style: getBoldFont().copyWith(fontSize: 25),)),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (_) => const TasksDetails())).then((value){
@@ -161,7 +165,7 @@ class _HomePageState extends State<HomePage> {
                                     child: Center(child: Image.asset(_images[index],width: 25,height: 25,),),
                                   ),
                                   const Gap(10),
-                                  Text(_tabs[index],style: getMedFont().copyWith(fontSize: 18),)
+                                  Text(_translations[index],style: getMedFont().copyWith(fontSize: 18),)
                                 ],
                               ),
                             )

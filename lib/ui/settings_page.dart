@@ -1,6 +1,9 @@
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Trans;
+import 'package:todos_app/languages/locale_keys.g.dart';
 import 'package:todos_app/storage/storage_helper.dart';
 import 'package:todos_app/utils.dart';
 
@@ -16,7 +19,8 @@ class _SettingsPageState extends State<SettingsPage> {
   String mode = "Light";
   String language = "English";
   int selectedRadio = 0;
-  final List<String> _languages  = ["English","French","Spanish","Italian"];
+  final List<String> _locales  = ["en","fr","es","it"];
+  late List<String> _languages;
   @override
   void initState() {
     super.initState();
@@ -24,12 +28,17 @@ class _SettingsPageState extends State<SettingsPage> {
       language = StorageHelper.getSelectedLanguage();
       selectedRadio = StorageHelper.getCode();
       isDark = StorageHelper.getCurrentMode();
-      isDark ? mode = "Dark" : mode = "Light";
+      isDark ? mode = LocaleKeys.dark.tr() : mode = LocaleKeys.light.tr();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    _languages = [
+      LocaleKeys.english.tr(),
+      LocaleKeys.french.tr(),
+      LocaleKeys.spanish.tr(),
+      LocaleKeys.italian.tr()];
     return SafeArea(
       child: Scaffold(
         body: Column(
@@ -45,7 +54,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Image.asset("assets/images/arrow.png",width: 25,height: 25,),
                   ),
                   const Gap(5),
-                  Text("Settings",style: getBoldFont().copyWith(fontSize: 20),)
+                  Text(LocaleKeys.settings.tr(),style: getBoldFont().copyWith(fontSize: 20),)
                 ],
               ),
             ),
@@ -57,7 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Current Mode",style: getBoldFont().copyWith(fontSize: 20),),
+                        Text(LocaleKeys.currentMode.tr(),style: getBoldFont().copyWith(fontSize: 20),),
                         Text(mode,style: getMedFont().copyWith(fontSize: 18),)
                       ],
                     ),
@@ -67,7 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       onChanged: (value){
                      setState(() {
                        isDark = value;
-                       isDark ? mode = "Dark" : mode = "Light";
+                       isDark ? mode = LocaleKeys.dark.tr() : mode = LocaleKeys.light.tr();
                      });
                      if(isDark){
                        StorageHelper.setValue(true);
@@ -93,13 +102,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Current Language",style: getBoldFont().copyWith(fontSize: 20),),
+                        Text(LocaleKeys.currentLanguage.tr(),style: getBoldFont().copyWith(fontSize: 20),),
                         Text(language,style: getMedFont().copyWith(fontSize: 18),)
                       ],
                     ),
                   ),
                   GestureDetector(
-                    onTap: (){
+                    onTap: () async {
                       // show bottom sheet with 3 languages
                       showDialog(
                           context: context,
@@ -121,14 +130,16 @@ class _SettingsPageState extends State<SettingsPage> {
                                             Radio<int>(
                                                 value: index,
                                                 groupValue: selectedRadio,
-                                                onChanged: (index){
+                                                onChanged: (index) async {
                                                   setState(() {
                                                     selectedRadio = index!;
                                                     language = _languages[index];
                                                   });
+                                                  await context.setLocale(Locale(_locales[index!]));
+                                                  Get.updateLocale(Locale(_locales[index]));
                                                   StorageHelper.setSelectedLanguage(language);
                                                   StorageHelper.setCode(selectedRadio);
-                                                  Navigator.pop(context);
+                                                  if (context.mounted) Navigator.pop(context);
                                                 })
                                           ],
                                         );

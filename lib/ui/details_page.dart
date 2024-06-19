@@ -1,16 +1,17 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 
+import '../languages/locale_keys.g.dart';
 import 'package:alarm/alarm.dart';
 import 'package:alarm/model/alarm_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:todos_app/controller/todos_controller.dart';
 import 'package:todos_app/models/task_model.dart';
-import 'package:todos_app/notification_helper.dart';
 import 'package:todos_app/utils.dart';
+import 'package:get/get.dart' hide Trans;
 
 class TasksDetails extends StatefulWidget {
   const TasksDetails({super.key});
@@ -33,6 +34,7 @@ class _TasksDetailsState extends State<TasksDetails> {
   static final TextEditingController _taskController = TextEditingController();
   static final TextEditingController _dateController = TextEditingController();
   static final TextEditingController _timeController = TextEditingController();
+  late List<String> _translations;
   final List<String> _colors = ["#f3f6f4", "#f1e8ce", "#f5f5dc", "#fceee2", "#94b1ff", "#93e9be"];
   final List<String> _images = [
     "assets/images/personal.png",
@@ -49,6 +51,7 @@ class _TasksDetailsState extends State<TasksDetails> {
 
   @override
   Widget build(BuildContext context) {
+    _translations = getTranslations();
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
@@ -66,13 +69,13 @@ class _TasksDetailsState extends State<TasksDetails> {
                       child: Image.asset("assets/images/arrow.png", width: 30, height: 30),
                     ),
                     const Gap(5),
-                    Text("Add Task", style: getBoldFont().copyWith(fontSize: 35)),
+                    Text(LocaleKeys.addTask.tr(), style: getBoldFont().copyWith(fontSize: 35)),
                   ],
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 30, right: 30, top: 50),
-                child: Text("Task Title", style: getMedFont().copyWith(fontSize: 20)),
+                child: Text(LocaleKeys.taskTitle.tr(), style: getMedFont().copyWith(fontSize: 20)),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 30, right: 30, top: 5),
@@ -82,14 +85,14 @@ class _TasksDetailsState extends State<TasksDetails> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
                     contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                    hintText: "Task Title",
+                    hintText: LocaleKeys.taskTitle.tr(),
                     hintStyle: getMedFont(),
                   ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 30, right: 30, top: 20),
-                child: Text("Task Date", style: getMedFont().copyWith(fontSize: 20)),
+                child: Text(LocaleKeys.taskDate.tr(), style: getMedFont().copyWith(fontSize: 20)),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 30, right: 30, top: 5),
@@ -100,7 +103,7 @@ class _TasksDetailsState extends State<TasksDetails> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
                     contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                    hintText: "Task Date",
+                    hintText: LocaleKeys.taskDate.tr(),
                     suffixIcon: GestureDetector(
                       onTap: () async {
                         var datePicked = await showDatePicker(
@@ -126,7 +129,7 @@ class _TasksDetailsState extends State<TasksDetails> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 30, right: 30, top: 20),
-                child: Text("Task Time", style: getMedFont().copyWith(fontSize: 18)),
+                child: Text(LocaleKeys.taskTime.tr(), style: getMedFont().copyWith(fontSize: 18)),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 30, right: 30, top: 5),
@@ -137,7 +140,7 @@ class _TasksDetailsState extends State<TasksDetails> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
                     contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                    hintText: "Task Time",
+                    hintText: LocaleKeys.taskTime.tr(),
                     hintStyle: getMedFont().copyWith(),
                     suffixIcon: GestureDetector(
                       onTap: () async {
@@ -161,7 +164,7 @@ class _TasksDetailsState extends State<TasksDetails> {
               const Gap(30),
               Padding(
                 padding: const EdgeInsets.only(left: 30, right: 30, top: 20),
-                child: Text("Pick Your Task Color", style: getMedFont().copyWith(fontSize: 18)),
+                child: Text(LocaleKeys.pickTaskColor.tr(), style: getMedFont().copyWith(fontSize: 18)),
               ),
               const Gap(10),
               Padding(
@@ -196,7 +199,7 @@ class _TasksDetailsState extends State<TasksDetails> {
               const Gap(20),
               Padding(
                 padding: const EdgeInsets.only(left: 30,right: 30,top: 20),
-                child: Text("Pick Category",style: getMedFont().copyWith(fontSize: 18),),
+                child: Text(LocaleKeys.pickCategory.tr(),style: getMedFont().copyWith(fontSize: 18),),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 30,right: 30,top: 20),
@@ -226,7 +229,7 @@ class _TasksDetailsState extends State<TasksDetails> {
                           children: [
                             Image.asset(_images[index],width: 40,height: 40,color: Colors.white,),
                             const Gap(5),
-                            Text(_categories[index],style: getMedFont().copyWith(fontSize: 15,color: Colors.white),)
+                            Text(_translations[index],style: getMedFont().copyWith(fontSize: 14,color: Colors.white),)
                           ],
                         ),),
                       ),
@@ -301,7 +304,7 @@ class _TasksDetailsState extends State<TasksDetails> {
                         color: Colors.blueGrey,
                       ),
                       child: Center(
-                        child: Text("Add Task", style: getMedFont().copyWith(color: Colors.white)),
+                        child: Text(LocaleKeys.addTask.tr(), style: getMedFont().copyWith(color: Colors.white)),
                       ),
                     ),
                   ),
